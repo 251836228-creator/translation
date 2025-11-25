@@ -3,11 +3,13 @@ import { SearchResult, Language } from '../types';
 
 // Support Vite environment variables strictly to avoid 'process is not defined' errors in browser
 const getClient = () => {
-  // @ts-ignore - import.meta is available in Vite environments
-  const apiKey = import.meta.env.VITE_API_KEY;
+  // Cast import.meta to any to avoid TypeScript errors regarding 'env' property
+  const apiKey = (import.meta as any).env.VITE_API_KEY;
   
+  // Debug log to help troubleshoot (check browser console F12)
   if (!apiKey) {
-    throw new Error("Missing API Key. Please set 'VITE_API_KEY' in your Vercel Environment Variables.");
+    console.error("VITE_API_KEY is missing. Current env:", (import.meta as any).env);
+    throw new Error("Missing API Key. Please set 'VITE_API_KEY' in your Vercel Environment Variables and Redeploy.");
   }
   
   return new GoogleGenAI({ apiKey });
