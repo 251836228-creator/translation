@@ -1,7 +1,15 @@
 import { GoogleGenAI, Type, Modality } from "@google/genai";
 import { SearchResult, Language } from '../types';
 
-const getClient = () => new GoogleGenAI({ apiKey: process.env.API_KEY });
+// Support both standard process.env (Node/Webpack) and import.meta.env (Vite)
+const getClient = () => {
+  // @ts-ignore - import.meta is available in Vite environments
+  const apiKey = import.meta.env?.VITE_API_KEY || process.env.API_KEY;
+  if (!apiKey) {
+    console.error("Gemini API Key is missing. Please check your .env file or Vercel Environment Variables.");
+  }
+  return new GoogleGenAI({ apiKey: apiKey || "" });
+};
 
 // --- Helper for Audio Decoding ---
 
