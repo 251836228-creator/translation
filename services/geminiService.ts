@@ -1,14 +1,16 @@
 import { GoogleGenAI, Type, Modality } from "@google/genai";
 import { SearchResult, Language } from '../types';
 
-// Support both standard process.env (Node/Webpack) and import.meta.env (Vite)
+// Support Vite environment variables strictly to avoid 'process is not defined' errors in browser
 const getClient = () => {
   // @ts-ignore - import.meta is available in Vite environments
-  const apiKey = import.meta.env?.VITE_API_KEY || process.env.API_KEY;
+  const apiKey = import.meta.env.VITE_API_KEY;
+  
   if (!apiKey) {
-    console.error("Gemini API Key is missing. Please check your .env file or Vercel Environment Variables.");
+    throw new Error("Missing API Key. Please set 'VITE_API_KEY' in your Vercel Environment Variables.");
   }
-  return new GoogleGenAI({ apiKey: apiKey || "" });
+  
+  return new GoogleGenAI({ apiKey });
 };
 
 // --- Helper for Audio Decoding ---

@@ -61,9 +61,22 @@ const App: React.FC = () => {
       const imageUrl = await imagePromise;
       setCurrentResult(prev => prev ? { ...prev, imageUrl } : null);
 
-    } catch (e) {
+    } catch (e: any) {
       console.error(e);
-      alert("AI hiccup. Try again!");
+      // Improve error reporting
+      let errorMessage = "AI hiccup. Try again!";
+      if (e?.message) {
+         if (e.message.includes("VITE_API_KEY")) {
+             errorMessage = e.message;
+         } else if (e.message.includes("401") || e.message.includes("403")) {
+             errorMessage = "API Auth Error: Please check your API Key in Vercel settings.";
+         } else if (e.message.includes("503")) {
+             errorMessage = "AI is busy. Please wait a moment and try again.";
+         } else {
+             errorMessage = "Error: " + e.message;
+         }
+      }
+      alert(errorMessage);
       setView(ViewState.SEARCH);
     } finally {
       setLoading(false);
